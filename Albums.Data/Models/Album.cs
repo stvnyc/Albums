@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Albums.Data.Models;
 
-public class Albums
+public class Album
 {
     [Key]
     public int AlbumId { get; set; }

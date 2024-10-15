@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Albums.Data.Models;
 
-public class Genres
+public class Genre
 {
     [Key]
     public int GenreId { get; set; }
