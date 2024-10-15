@@ -8,101 +8,108 @@ using Microsoft.EntityFrameworkCore;
 using Albums.Api.DAL;
 using Albums.Data.Models;
 
-namespace Albums.Api.Controllers
+namespace Albums.Api.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class GenresController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class GenresController : ControllerBase
+    private readonly Context _context;
+
+    public GenresController(Context context)
     {
-        private readonly Context _context;
+        _context = context;
+    }
 
-        public GenresController(Context context)
+    // GET: api/Genres
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Genre>>> Getgenre()
+    {
+        return await _context.genre.ToListAsync();
+    }
+
+    // GET: api/Genres/5
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Genre>> GetGenre(int id)
+    {
+        var genre = await _context.genre.FindAsync(id);
+
+        if (genre == null)
         {
-            _context = context;
+            return NotFound();
         }
 
-        // GET: api/Genres
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Genre>>> Getgenre()
+        return genre;
+    }
+
+    // PUT: api/Genres/5
+    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutGenre(int id, Genre genre)
+    {
+        if (id != genre.GenreId)
         {
-            return await _context.genre.ToListAsync();
+            return BadRequest();
         }
 
-        // GET: api/Genres/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Genre>> GetGenre(int id)
-        {
-            var genre = await _context.genre.FindAsync(id);
+        _context.Entry(genre).State = EntityState.Modified;
 
-            if (genre == null)
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!GenreExists(id))
             {
                 return NotFound();
             }
-
-            return genre;
+            else
+            {
+                throw;
+            }
         }
 
-        // PUT: api/Genres/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGenre(int id, Genre genre)
-        {
-            if (id != genre.GenreId)
-            {
-                return BadRequest();
-            }
+        return NoContent();
+    }
 
-            _context.Entry(genre).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!GenreExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Genres
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Genre>> PostGenre(Genre genre)
+    // POST: api/Genres
+    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    [HttpPost]
+    public async Task<ActionResult<Genre>> PostGenre(Genre genre)
+    {
+        if (genre.GenreId <= 0 || !GenreExists(genre.GenreId))
         {
             _context.genre.Add(genre);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetGenre", new { id = genre.GenreId }, genre);
         }
-
-        // DELETE: api/Genres/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGenre(int id)
+        else
         {
-            var genre = await _context.genre.FindAsync(id);
-            if (genre == null)
-            {
-                return NotFound();
-            }
-
-            _context.genre.Remove(genre);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            _context.genre.Update(genre);
         }
+        await _context.SaveChangesAsync();
+        return Ok(genre);
+    }
 
-        private bool GenreExists(int id)
+    // DELETE: api/Genres/5
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteGenre(int id)
+    {
+        if (!_context.genre.Any())
         {
-            return _context.genre.Any(e => e.GenreId == id);
+            return NotFound();
         }
+        var genre = await _context.genre.FindAsync(id);
+        if (genre == null)
+        {
+            return NotFound();
+        }
+        _context.genre.Remove(genre);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    private bool GenreExists(int id)
+    {
+        return _context.genre.Any(e => e.GenreId == id);
     }
 }
