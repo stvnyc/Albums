@@ -1,0 +1,6 @@
+@Albums.Api_HostAddress = http://localhost:5139
+
+GET {{Albums.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
