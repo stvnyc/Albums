@@ -25,4 +25,8 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Albums.Data\Albums.Data.csproj" />
+  </ItemGroup>
+
 </Project>
